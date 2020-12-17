@@ -1,3 +1,5 @@
+models/figs/
+
 compiler/__pycache__/
 compiler/bioproc/__pycache__/
 compiler/programs/__pycache__/

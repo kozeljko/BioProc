@@ -31,6 +31,23 @@ def activate_2(A1, A2, Kd1, n1, Kd2=0, n2=0):
 def activate_3(A1, A2, A3, Kd, n):
     return activate_1(A1, Kd, n) * activate_1(A2, Kd, n) * activate_1(A3, Kd, n)
 
+def activate_OR_2(A1, A2, Kd1, n1, Kd2=0, n2=0):
+
+    if not Kd2:
+        Kd2 = Kd1
+    if not n2:
+        n2 = n1
+     
+    return (pow(A1/Kd1, n1) + pow(A2/Kd2, n2) + pow(A1/Kd1, n1)*pow(A2/Kd2, n2))/(1 + pow(A1/Kd1, n1) + pow(A2/Kd2, n2) + pow(A1/Kd1, n1) * pow(A2/Kd2, n2))
+
+def activate_XOR_2(A1, A2, Kd1, n1, Kd2=0, n2=0):
+
+    if not Kd2:
+        Kd2 = Kd1
+    if not n2:
+        n2 = n1
+     
+    return (pow(A1/Kd1, n1) + pow(A2/Kd2, n2))/(1 + pow(A1/Kd1, n1) + pow(A2/Kd2, n2) + pow(A1/Kd1, n1) * pow(A2/Kd2, n2))
 
 def hybrid(A, R, Kd_A, n_A, Kd_R, n_R):
     return activate_1(A, Kd_A, n_A) * repress_1(R, Kd_R, n_R)
