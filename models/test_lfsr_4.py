@@ -39,7 +39,7 @@ params_addr = list(params[8:])
 
 # four-bit register with external clock
 # a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, d1_in, d2_in, d3_in, d4_in, xor34
-Y0 = np.array([0] * 21)
+Y0 = np.array([0] * 23)
 # Y0[0] = 1 # a1
 # Y0[2] = 1 # q1
 T = np.linspace(0, t_end, N)
