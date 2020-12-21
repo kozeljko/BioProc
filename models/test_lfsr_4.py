@@ -38,10 +38,10 @@ params_ff = list(params[:8])
 params_addr = list(params[8:])
 
 # four-bit register with external clock
-# a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, xor34
-Y0 = np.array([0] * 17)
-#Y0[0] = 1 # a1
-Y0[2] = 1 # q1
+# a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, d1_in, d2_in, d3_in, d4_in, xor34
+Y0 = np.array([0] * 21)
+# Y0[0] = 1 # a1
+# Y0[2] = 1 # q1
 T = np.linspace(0, t_end, N)
 
 Y = odeint(four_bit_sr, Y0, T, args=(params_ff, ))
@@ -63,21 +63,22 @@ not_Q3 = Y_reshaped[11]
 Q4 = Y_reshaped[14]
 not_Q4 = Y_reshaped[15]
 
+plt.style.use('dark_background')
 
 plt.subplot(4, 1, 1)
-plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='black', alpha=0.25)
+plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='white', alpha=0.25)
 plt.plot(T, Q1, label='q1', color='tab:blue')
 plt.legend()
 plt.subplot(4, 1, 2)
-plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='black', alpha=0.25)
+plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='white', alpha=0.25)
 plt.plot(T, Q2, label='q2', color='tab:orange')
 plt.legend()
 plt.subplot(4, 1, 3)
-plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='black', alpha=0.25)
+plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='white', alpha=0.25)
 plt.plot(T, Q3, label='q3', color='tab:green')
 plt.legend()
 plt.subplot(4, 1, 4)
-plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='black', alpha=0.25)
+plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='white', alpha=0.25)
 plt.plot(T, Q4, label='q4', color='tab:red')
 plt.legend()
 

@@ -547,16 +547,25 @@ def three_bit_processor_ext_RS_cond(Y, T, params_johnson_RS, params_addr, jump_s
 
 # SR
 def four_bit_sr(Y, T, params):
-    a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, xor34 = Y
+    a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, d1_in, d2_in, d3_in, d4_in, xor34 = Y
+
+    # TODO un-hardcode
+    X1 = 100
+    X2 = 0
+    X3 = 0
+    X4 = 0
+    WE = 0
+    if 100 < T < 200:
+        WE = 100
 
     clk = get_clock(T) 
 
     alpha1, alpha2, alpha3, alpha4, delta1, delta2, Kd, n = params
 
-    d1 = xor34
-    d2 = q1
-    d3 = q2
-    d4 = q3
+    d1 = d1_in # xor34
+    d2 = d2_in # q1
+    d3 = d3_in # q2
+    d4 = d4_in # q3
 
     Y_FF1 = [a1, not_a1, q1, not_q1, d1, clk]
     Y_FF2 = [a2, not_a2, q2, not_q2, d2, clk]
@@ -572,7 +581,14 @@ def four_bit_sr(Y, T, params):
     # dY_xor34 = alpha1 * activate_OR_2(q3, q4, Kd, n) - delta1 * xor34
     dY_xor34 = alpha1 * activate_2(q3 + q4, not_q3 + not_q4, Kd, n) - delta2 * xor34
 
+    dY_d1_in = alpha1 * hybrid(xor34, WE, Kd, n, Kd, n) + alpha1 * activate_2(X1, WE, Kd, n) - delta2 * d1_in
+    dY_d2_in = alpha1 * hybrid(q1, WE, Kd, n, Kd, n) + alpha1 * activate_2(X2, WE, Kd, n) - delta2 * d2_in
+    dY_d3_in = alpha1 * hybrid(q2, WE, Kd, n, Kd, n) + alpha1 * activate_2(X3, WE, Kd, n) - delta2 * d3_in
+    dY_d4_in = alpha1 * hybrid(q3, WE, Kd, n, Kd, n) + alpha1 * activate_2(X4, WE, Kd, n) - delta2 * d4_in
 
-    dY = np.append(np.append(np.append(np.append(dY1, dY2), dY3), dY4), dY_xor34)
+    output = [dY1, dY2, dY3, dY4, dY_d1_in, dY_d2_in, dY_d3_in, dY_d4_in, dY_xor34]
+    dY = np.array([])
+    for out in output:
+        dY = np.append(dY, out)
 
     return dY
