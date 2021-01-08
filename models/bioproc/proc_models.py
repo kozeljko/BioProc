@@ -576,6 +576,7 @@ def four_bit_sr(Y, T, params_ff):
 
     return dY
 
+
 # LFSR 
 
 def four_bit_lfsr_34(Y, T, params_ff, params_input):
@@ -622,6 +623,7 @@ def four_bit_lfsr_34(Y, T, params_ff, params_input):
 
     return dY
 
+
 def four_bit_lfsr_234(Y, T, params_ff, params_input):
     a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, d1_in, d2_in, d3_in, d4_in, xor34, not_xor34, xor234 = Y
 
@@ -663,6 +665,122 @@ def four_bit_lfsr_234(Y, T, params_ff, params_input):
     dY_d4_in = alpha1 * hybrid(q3, WE, Kd, n, Kd, n) + alpha1 * activate_2(X4, WE, Kd, n) - delta2 * d4_in
 
     output = [dY1, dY2, dY3, dY4, dY_d1_in, dY_d2_in, dY_d3_in, dY_d4_in, dY_xor34, dY_not_xor34, dY_xor234]
+    dY = np.array([])
+    for out in output:
+        dY = np.append(dY, out)
+
+    return dY
+
+def four_bit_lfsr_234_adv(Y, T, params_ff, params_input):
+    a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, d1_in, d2_in, d3_in, d4_in, \
+    xor34, not_xor34, xor234, q3_or_q4, nq3_or_nq4, q2_or_x34, nq2_or_nx34 = Y
+
+    clk = get_clock(T) 
+
+    WE = 0 # Write Enable
+    X1, X2, X3, X4, WE_periods = params_input
+    for period in WE_periods:
+        if period[0] < T < period[1]:
+            WE = 100
+            break
+
+    alpha1, alpha2, alpha3, alpha4, delta1, delta2, Kd, n = params_ff
+
+    d1 = d1_in # xor234
+    d2 = d2_in # q1
+    d3 = d3_in # q2
+    d4 = d4_in # q3
+
+    Y_FF1 = [a1, not_a1, q1, not_q1, d1, clk]
+    Y_FF2 = [a2, not_a2, q2, not_q2, d2, clk]
+    Y_FF3 = [a3, not_a3, q3, not_q3, d3, clk]
+    Y_FF4 = [a4, not_a4, q4, not_q4, d4, clk]
+
+    dY1 = ff_ode_model(Y_FF1, T, params_ff)
+    dY2 = ff_ode_model(Y_FF2, T, params_ff)
+    dY3 = ff_ode_model(Y_FF3, T, params_ff)
+    dY4 = ff_ode_model(Y_FF4, T, params_ff)
+
+    
+    dY_xor34 = alpha1 * activate_2(q3_or_q4, nq3_or_nq4, Kd, n) - delta2 * xor34
+    dY_not_xor34 = alpha1 * repress_1(xor34, Kd, n) - delta2 * not_xor34
+    dY_xor234 = alpha1 * activate_2(q2_or_x34, nq2_or_nx34, Kd, n) - delta2 * xor234
+
+    dY_q3_or_q4 = alpha1 * activate_OR_2(q3, q4, Kd, n) - delta2 * q3_or_q4
+    dY_nq3_or_nq4 = alpha1 * activate_OR_2(not_q3, not_q4, Kd, n) - delta2 * nq3_or_nq4
+    dY_q2_or_x34 = alpha1 * activate_OR_2(q2, xor34, Kd, n) - delta2 * q2_or_x34
+    dY_nq2_or_nx34 = alpha1 * activate_OR_2(not_q2, not_xor34, Kd, n) - delta2 * nq2_or_nx34
+     
+
+    dY_d1_in = alpha1 * hybrid(xor234, WE, Kd, n, Kd, n) + alpha1 * activate_2(X1, WE, Kd, n) - delta2 * d1_in
+    dY_d2_in = alpha1 * hybrid(q1, WE, Kd, n, Kd, n) + alpha1 * activate_2(X2, WE, Kd, n) - delta2 * d2_in
+    dY_d3_in = alpha1 * hybrid(q2, WE, Kd, n, Kd, n) + alpha1 * activate_2(X3, WE, Kd, n) - delta2 * d3_in
+    dY_d4_in = alpha1 * hybrid(q3, WE, Kd, n, Kd, n) + alpha1 * activate_2(X4, WE, Kd, n) - delta2 * d4_in
+
+    output = [dY1, dY2, dY3, dY4, dY_d1_in, dY_d2_in, dY_d3_in, dY_d4_in, dY_xor34, dY_not_xor34, dY_xor234, dY_q3_or_q4, dY_nq3_or_nq4, dY_q2_or_x34, dY_nq2_or_nx34]
+    dY = np.array([])
+    for out in output:
+        dY = np.append(dY, out)
+
+    return dY
+
+
+def eight_bit_lfsr_8654(Y, T, params_ff, params_input):
+    a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, \
+    a5, not_a5, q5, not_q5, a6, not_a6, q6, not_q6, a7, not_a7, q7, not_q7, a8, not_a8, q8, not_q8, \
+    d1_in, d2_in, d3_in, d4_in, d5_in, d6_in, d7_in, d8_in, xor78 = Y
+
+    clk = get_clock(T) 
+
+    WE = 0 # Write Enable
+    X1, X2, X3, X4, X5, X6, X7, X8, WE_periods = params_input
+    for period in WE_periods:
+        if period[0] < T < period[1]:
+            WE = 100
+            break
+
+    alpha1, alpha2, alpha3, alpha4, delta1, delta2, Kd, n = params_ff
+
+    d1 = d1_in # xor234
+    d2 = d2_in # q1
+    d3 = d3_in # q2
+    d4 = d4_in # q3
+    d5 = d5_in # q4
+    d6 = d6_in # q5
+    d7 = d7_in # q6
+    d8 = d8_in # q7
+
+    Y_FF1 = [a1, not_a1, q1, not_q1, d1, clk]
+    Y_FF2 = [a2, not_a2, q2, not_q2, d2, clk]
+    Y_FF3 = [a3, not_a3, q3, not_q3, d3, clk]
+    Y_FF4 = [a4, not_a4, q4, not_q4, d4, clk]
+    Y_FF5 = [a5, not_a5, q5, not_q5, d5, clk]
+    Y_FF6 = [a6, not_a6, q6, not_q6, d6, clk]
+    Y_FF7 = [a7, not_a7, q7, not_q7, d7, clk]
+    Y_FF8 = [a8, not_a8, q8, not_q8, d8, clk]
+
+    dY1 = ff_ode_model(Y_FF1, T, params_ff)
+    dY2 = ff_ode_model(Y_FF2, T, params_ff)
+    dY3 = ff_ode_model(Y_FF3, T, params_ff)
+    dY4 = ff_ode_model(Y_FF4, T, params_ff)
+    dY5 = ff_ode_model(Y_FF5, T, params_ff)
+    dY6 = ff_ode_model(Y_FF6, T, params_ff)
+    dY7 = ff_ode_model(Y_FF7, T, params_ff)
+    dY8 = ff_ode_model(Y_FF8, T, params_ff)
+
+    dY_xor78 = alpha1 * activate_2(q7 + q8, not_q7 + not_q8, Kd, n) - delta2 * xor78
+
+    dY_d1_in = alpha1 * hybrid(xor78, WE, Kd, n, Kd, n) + alpha1 * activate_2(X1, WE, Kd, n) - delta2 * d1_in
+    dY_d2_in = alpha1 * hybrid(q1, WE, Kd, n, Kd, n) + alpha1 * activate_2(X2, WE, Kd, n) - delta2 * d2_in
+    dY_d3_in = alpha1 * hybrid(q2, WE, Kd, n, Kd, n) + alpha1 * activate_2(X3, WE, Kd, n) - delta2 * d3_in
+    dY_d4_in = alpha1 * hybrid(q3, WE, Kd, n, Kd, n) + alpha1 * activate_2(X4, WE, Kd, n) - delta2 * d4_in
+    dY_d5_in = alpha1 * hybrid(q4, WE, Kd, n, Kd, n) + alpha1 * activate_2(X5, WE, Kd, n) - delta2 * d5_in
+    dY_d6_in = alpha1 * hybrid(q5, WE, Kd, n, Kd, n) + alpha1 * activate_2(X6, WE, Kd, n) - delta2 * d6_in
+    dY_d7_in = alpha1 * hybrid(q6, WE, Kd, n, Kd, n) + alpha1 * activate_2(X7, WE, Kd, n) - delta2 * d7_in
+    dY_d8_in = alpha1 * hybrid(q7, WE, Kd, n, Kd, n) + alpha1 * activate_2(X8, WE, Kd, n) - delta2 * d8_in
+    
+
+    output = [dY1, dY2, dY3, dY4, dY5, dY6, dY7, dY8, dY_d1_in, dY_d2_in, dY_d3_in, dY_d4_in, dY_d5_in, dY_d6_in, dY_d7_in, dY_d8_in, dY_xor78]
     dY = np.array([])
     for out in output:
         dY = np.append(dY, out)

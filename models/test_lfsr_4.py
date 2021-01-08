@@ -38,13 +38,16 @@ params_ff = list(params[:8])
 params_addr = list(params[8:])
 
 
+# Time
+T = np.linspace(0, t_end, N)
+
+
 # Input parameters
 # X1, X2, X3, X4
 params_input = [0, 100, 0, 100, [(100, 200)]]
 
-# Time
-T = np.linspace(0, t_end, N)
 
+# Uncomment the model you want to test
 
 
 # # 4-bit SR
@@ -67,14 +70,18 @@ T = np.linspace(0, t_end, N)
 
 
 
-# 4-bit LFSR (234)
-# a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, d1_in, d2_in, d3_in, d4_in, xor34, not_xor34, xor234
-Y0 = np.array([0] * 23)
-
-Y = odeint(four_bit_lfsr_234, Y0, T, args=(params_ff, params_input))
-
+# # 4-bit LFSR (234)
+# # a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, d1_in, d2_in, d3_in, d4_in, xor34, not_xor34, xor234
+# Y0 = np.array([0] * 23)
+# Y = odeint(four_bit_lfsr_234, Y0, T, args=(params_ff, params_input))
 
 
+
+# 4-bit LFSR Advanced (234)
+# a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, d1_in, d2_in, d3_in, d4_in,
+# xor34, not_xor34, xor234, q3_or_q4, nq3_or_nq4, q2_or_x34, nq2_or_nx34
+Y0 = np.array([0] * 27)
+Y = odeint(four_bit_lfsr_234_adv, Y0, T, args=(params_ff, params_input))
 
 
 
@@ -127,5 +134,5 @@ plt.legend()
 # plt.legend()
 
 
-plt.savefig('figs\\lfsr.pdf')
+plt.savefig('figs\\lfsr4.pdf')
 plt.show()
