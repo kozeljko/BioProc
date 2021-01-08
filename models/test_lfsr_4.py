@@ -37,14 +37,46 @@ params = points[0]
 params_ff = list(params[:8])
 params_addr = list(params[8:])
 
-# four-bit register with external clock
-# a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, d1_in, d2_in, d3_in, d4_in, xor34
-Y0 = np.array([0] * 23)
-# Y0[0] = 1 # a1
-# Y0[2] = 1 # q1
+
+# Input parameters
+# X1, X2, X3, X4
+params_input = [0, 100, 0, 100, [(100, 200)]]
+
+# Time
 T = np.linspace(0, t_end, N)
 
-Y = odeint(four_bit_sr, Y0, T, args=(params_ff, ))
+
+
+# # 4-bit SR
+# # a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4
+# Y0 = np.array([0] * 16)
+
+# Y0[0] = Y0[2] = 1 # a1
+# Y0[4] = Y0[6] = 1 # a2
+# Y0[8] = Y0[10] = 0 # a3
+# Y0[12] = Y0[14] = 0 # a4
+# Y = odeint(four_bit_sr, Y0, T, args=(params_ff, ))
+
+
+
+# # 4-bit LFSR (34)
+# # a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, d1_in, d2_in, d3_in, d4_in, xor34
+# Y0 = np.array([0] * 21)
+
+# Y = odeint(four_bit_lfsr_34, Y0, T, args=(params_ff, params_input))
+
+
+
+# 4-bit LFSR (234)
+# a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, d1_in, d2_in, d3_in, d4_in, xor34, not_xor34, xor234
+Y0 = np.array([0] * 23)
+
+Y = odeint(four_bit_lfsr_234, Y0, T, args=(params_ff, params_input))
+
+
+
+
+
 
 Y_reshaped = np.split(Y, Y.shape[1], 1)
 """

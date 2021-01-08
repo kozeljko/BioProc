@@ -543,24 +543,54 @@ def three_bit_processor_ext_RS_cond(Y, T, params_johnson_RS, params_addr, jump_s
 
 
 
-# LFSR Stuff
+# Seminarska naloga
 
 # SR
-def four_bit_sr(Y, T, params):
-    a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, d1_in, d2_in, d3_in, d4_in, xor34, not_xor34, xor234 = Y
 
-    # TODO un-hardcode
-    X1 = 0
-    X2 = 100
-    X3 = 0
-    X4 = 100
-    WE = 0
-    if 100 < T < 200:
-        WE = 100
+def four_bit_sr(Y, T, params_ff):
+    a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4 = Y
+
+    clk = get_clock(T)
+
+    alpha1, alpha2, alpha3, alpha4, delta1, delta2, Kd, n = params_ff
+
+    d1 = q4
+    d2 = q1
+    d3 = q2
+    d4 = q3
+
+    Y_FF1 = [a1, not_a1, q1, not_q1, d1, clk]
+    Y_FF2 = [a2, not_a2, q2, not_q2, d2, clk]
+    Y_FF3 = [a3, not_a3, q3, not_q3, d3, clk]
+    Y_FF4 = [a4, not_a4, q4, not_q4, d4, clk]
+
+    dY1 = ff_ode_model(Y_FF1, T, params_ff)
+    dY2 = ff_ode_model(Y_FF2, T, params_ff)
+    dY3 = ff_ode_model(Y_FF3, T, params_ff)
+    dY4 = ff_ode_model(Y_FF4, T, params_ff)
+
+    output = [dY1, dY2, dY3, dY4]
+    dY = np.array([])
+    for out in output:
+        dY = np.append(dY, out)
+
+    return dY
+
+# LFSR 
+
+def four_bit_lfsr_34(Y, T, params_ff, params_input):
+    a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, d1_in, d2_in, d3_in, d4_in, xor34 = Y
 
     clk = get_clock(T) 
 
-    alpha1, alpha2, alpha3, alpha4, delta1, delta2, Kd, n = params
+    WE = 0 # Write Enable
+    X1, X2, X3, X4, WE_periods = params_input
+    for period in WE_periods:
+        if period[0] < T < period[1]:
+            WE = 100
+            break
+
+    alpha1, alpha2, alpha3, alpha4, delta1, delta2, Kd, n = params_ff
 
     d1 = d1_in # xor34
     d2 = d2_in # q1
@@ -572,10 +602,54 @@ def four_bit_sr(Y, T, params):
     Y_FF3 = [a3, not_a3, q3, not_q3, d3, clk]
     Y_FF4 = [a4, not_a4, q4, not_q4, d4, clk]
 
-    dY1 = ff_ode_model(Y_FF1, T, params)
-    dY2 = ff_ode_model(Y_FF2, T, params)
-    dY3 = ff_ode_model(Y_FF3, T, params)
-    dY4 = ff_ode_model(Y_FF4, T, params)
+    dY1 = ff_ode_model(Y_FF1, T, params_ff)
+    dY2 = ff_ode_model(Y_FF2, T, params_ff)
+    dY3 = ff_ode_model(Y_FF3, T, params_ff)
+    dY4 = ff_ode_model(Y_FF4, T, params_ff)
+
+
+    dY_xor34 = alpha1 * activate_2(q3 + q4, not_q3 + not_q4, Kd, n) - delta2 * xor34
+
+    dY_d1_in = alpha1 * hybrid(xor34, WE, Kd, n, Kd, n) + alpha1 * activate_2(X1, WE, Kd, n) - delta2 * d1_in
+    dY_d2_in = alpha1 * hybrid(q1, WE, Kd, n, Kd, n) + alpha1 * activate_2(X2, WE, Kd, n) - delta2 * d2_in
+    dY_d3_in = alpha1 * hybrid(q2, WE, Kd, n, Kd, n) + alpha1 * activate_2(X3, WE, Kd, n) - delta2 * d3_in
+    dY_d4_in = alpha1 * hybrid(q3, WE, Kd, n, Kd, n) + alpha1 * activate_2(X4, WE, Kd, n) - delta2 * d4_in
+
+    output = [dY1, dY2, dY3, dY4, dY_d1_in, dY_d2_in, dY_d3_in, dY_d4_in, dY_xor34]
+    dY = np.array([])
+    for out in output:
+        dY = np.append(dY, out)
+
+    return dY
+
+def four_bit_lfsr_234(Y, T, params_ff, params_input):
+    a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, d1_in, d2_in, d3_in, d4_in, xor34, not_xor34, xor234 = Y
+
+    clk = get_clock(T) 
+
+    WE = 0 # Write Enable
+    X1, X2, X3, X4, WE_periods = params_input
+    for period in WE_periods:
+        if period[0] < T < period[1]:
+            WE = 100
+            break
+
+    alpha1, alpha2, alpha3, alpha4, delta1, delta2, Kd, n = params_ff
+
+    d1 = d1_in # xor234
+    d2 = d2_in # q1
+    d3 = d3_in # q2
+    d4 = d4_in # q3
+
+    Y_FF1 = [a1, not_a1, q1, not_q1, d1, clk]
+    Y_FF2 = [a2, not_a2, q2, not_q2, d2, clk]
+    Y_FF3 = [a3, not_a3, q3, not_q3, d3, clk]
+    Y_FF4 = [a4, not_a4, q4, not_q4, d4, clk]
+
+    dY1 = ff_ode_model(Y_FF1, T, params_ff)
+    dY2 = ff_ode_model(Y_FF2, T, params_ff)
+    dY3 = ff_ode_model(Y_FF3, T, params_ff)
+    dY4 = ff_ode_model(Y_FF4, T, params_ff)
 
 
     # dY_xor34 = alpha1 * activate_OR_2(q3, q4, Kd, n) - delta1 * xor34
