@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 """
 
 # simulation parameters
-t_end = 200 * 2
+t_end = 300 * 2
 N = 1000 * 2
 
 
@@ -102,24 +102,37 @@ not_Q3 = Y_reshaped[11]
 Q4 = Y_reshaped[14]
 not_Q4 = Y_reshaped[15]
 
-plt.style.use('dark_background')
+
+# Plot offset
+off = int(186 * N / t_end)
+T = T[off:]
+Q1 = Q1[off:]
+Q2 = Q2[off:]
+Q3 = Q3[off:]
+Q4 = Q4[off:]
+
+plt.rcParams['figure.figsize'] = 8, 5
+
+#plt.style.use('dark_background')
 
 plt.subplot(4, 1, 1)
-plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='white', alpha=0.25)
+plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='black', alpha=0.25)
 plt.plot(T, Q1, label='q1', color='tab:blue')
 plt.legend()
 plt.subplot(4, 1, 2)
-plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='white', alpha=0.25)
+plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='black', alpha=0.25)
 plt.plot(T, Q2, label='q2', color='tab:orange')
 plt.legend()
 plt.subplot(4, 1, 3)
-plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='white', alpha=0.25)
+plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='black', alpha=0.25)
 plt.plot(T, Q3, label='q3', color='tab:green')
 plt.legend()
 plt.subplot(4, 1, 4)
-plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='white', alpha=0.25)
+plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='black', alpha=0.25)
 plt.plot(T, Q4, label='q4', color='tab:red')
 plt.legend()
+
+plt.subplots_adjust(0.06, 0.05, 0.94, 0.95, hspace=0.28)
 
 
 # plt.plot(T, Q1, label='q1')

@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 """
 
 # simulation parameters
-t_end = 200 * 2
+t_end = 300 * 2
 N = 1000 * 2
 
 
@@ -49,7 +49,7 @@ params_input = [0, 100, 0, 100, 100, 100, 0, 100, [(100, 200)]]
 
 # 8-bit LFSR (8654)
 
-Y0 = np.array([0] * 41)
+Y0 = np.array([0] * 45)
 
 Y = odeint(eight_bit_lfsr_8654, Y0, T, args=(params_ff, params_input))
 
@@ -80,41 +80,57 @@ Q8 = Y_reshaped[30]
 not_Q8 = Y_reshaped[31]
 
 
-plt.style.use('dark_background')
+# Plot offset
+off = int(186 * N / t_end)
+T = T[off:]
+Q1 = Q1[off:]
+Q2 = Q2[off:]
+Q3 = Q3[off:]
+Q4 = Q4[off:]
+Q5 = Q5[off:]
+Q6 = Q6[off:]
+Q7 = Q7[off:]
+Q8 = Q8[off:]
+
+
+#plt.style.use('dark_background')
+
+plt.rcParams['figure.figsize'] = 8, 10
 
 plt.subplot(8, 1, 1)
-plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='white', alpha=0.25)
+plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='black', alpha=0.25)
 plt.plot(T, Q1, label='q1', color='tab:blue')
 plt.legend()
 plt.subplot(8, 1, 2)
-plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='white', alpha=0.25)
+plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='black', alpha=0.25)
 plt.plot(T, Q2, label='q2', color='tab:orange')
 plt.legend()
 plt.subplot(8, 1, 3)
-plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='white', alpha=0.25)
+plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='black', alpha=0.25)
 plt.plot(T, Q3, label='q3', color='tab:green')
 plt.legend()
 plt.subplot(8, 1, 4)
-plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='white', alpha=0.25)
+plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='black', alpha=0.25)
 plt.plot(T, Q4, label='q4', color='tab:red')
 plt.legend()
 plt.subplot(8, 1, 5)
-plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='white', alpha=0.25)
-plt.plot(T, Q5, label='q5', color='tab:blue')
+plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='black', alpha=0.25)
+plt.plot(T, Q5, label='q5', color='tab:purple')
 plt.legend()
 plt.subplot(8, 1, 6)
-plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='white', alpha=0.25)
-plt.plot(T, Q6, label='q6', color='tab:orange')
+plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='black', alpha=0.25)
+plt.plot(T, Q6, label='q6', color='tab:brown')
 plt.legend()
 plt.subplot(8, 1, 7)
-plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='white', alpha=0.25)
-plt.plot(T, Q7, label='q7', color='tab:green')
+plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='black', alpha=0.25)
+plt.plot(T, Q7, label='q7', color='tab:pink')
 plt.legend()
 plt.subplot(8, 1, 8)
-plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='white', alpha=0.25)
-plt.plot(T, Q8, label='q8', color='tab:red')
+plt.plot(T, get_clock(T),  '--', linewidth=2, label="CLK", color='black', alpha=0.25)
+plt.plot(T, Q8, label='q8', color='tab:cyan')
 plt.legend()
 
+plt.subplots_adjust(0.06, 0.04, 0.94, 0.95, hspace=0.30)
 
 
 plt.savefig('figs\\lfsr8.pdf')

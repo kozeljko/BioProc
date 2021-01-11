@@ -728,7 +728,7 @@ def four_bit_lfsr_234_adv(Y, T, params_ff, params_input):
 def eight_bit_lfsr_8654(Y, T, params_ff, params_input):
     a1, not_a1, q1, not_q1, a2, not_a2, q2, not_q2, a3, not_a3, q3, not_q3, a4, not_a4, q4, not_q4, \
     a5, not_a5, q5, not_q5, a6, not_a6, q6, not_q6, a7, not_a7, q7, not_q7, a8, not_a8, q8, not_q8, \
-    d1_in, d2_in, d3_in, d4_in, d5_in, d6_in, d7_in, d8_in, xor78 = Y
+    d1_in, d2_in, d3_in, d4_in, d5_in, d6_in, d7_in, d8_in, xor68, not_xor68, xor45, not_xor45, xor4568 = Y
 
     clk = get_clock(T) 
 
@@ -768,9 +768,16 @@ def eight_bit_lfsr_8654(Y, T, params_ff, params_input):
     dY7 = ff_ode_model(Y_FF7, T, params_ff)
     dY8 = ff_ode_model(Y_FF8, T, params_ff)
 
-    dY_xor78 = alpha1 * activate_2(q7 + q8, not_q7 + not_q8, Kd, n) - delta2 * xor78
 
-    dY_d1_in = alpha1 * hybrid(xor78, WE, Kd, n, Kd, n) + alpha1 * activate_2(X1, WE, Kd, n) - delta2 * d1_in
+    dY_xor68 = alpha1 * activate_2(q6 + q8, not_q6 + not_q8, Kd, n) - delta2 * xor68
+    dY_not_xor68 = alpha1 * repress_1(xor68, Kd, n) - delta2 * not_xor68
+
+    dY_xor45 = alpha1 * activate_2(q4 + q5, not_q4 + not_q5, Kd, n) - delta2 * xor45
+    dY_not_xor45 = alpha1 * repress_1(xor45, Kd, n) - delta2 * not_xor45
+
+    dY_xor4568 = alpha1 * activate_2(xor45 + xor68, not_xor45 + not_xor68, Kd, n) - delta2 * xor4568
+
+    dY_d1_in = alpha1 * hybrid(xor4568, WE, Kd, n, Kd, n) + alpha1 * activate_2(X1, WE, Kd, n) - delta2 * d1_in
     dY_d2_in = alpha1 * hybrid(q1, WE, Kd, n, Kd, n) + alpha1 * activate_2(X2, WE, Kd, n) - delta2 * d2_in
     dY_d3_in = alpha1 * hybrid(q2, WE, Kd, n, Kd, n) + alpha1 * activate_2(X3, WE, Kd, n) - delta2 * d3_in
     dY_d4_in = alpha1 * hybrid(q3, WE, Kd, n, Kd, n) + alpha1 * activate_2(X4, WE, Kd, n) - delta2 * d4_in
@@ -780,7 +787,7 @@ def eight_bit_lfsr_8654(Y, T, params_ff, params_input):
     dY_d8_in = alpha1 * hybrid(q7, WE, Kd, n, Kd, n) + alpha1 * activate_2(X8, WE, Kd, n) - delta2 * d8_in
     
 
-    output = [dY1, dY2, dY3, dY4, dY5, dY6, dY7, dY8, dY_d1_in, dY_d2_in, dY_d3_in, dY_d4_in, dY_d5_in, dY_d6_in, dY_d7_in, dY_d8_in, dY_xor78]
+    output = [dY1, dY2, dY3, dY4, dY5, dY6, dY7, dY8, dY_d1_in, dY_d2_in, dY_d3_in, dY_d4_in, dY_d5_in, dY_d6_in, dY_d7_in, dY_d8_in, dY_xor68, dY_not_xor68, dY_xor45, dY_not_xor45, dY_xor4568]
     dY = np.array([])
     for out in output:
         dY = np.append(dY, out)
